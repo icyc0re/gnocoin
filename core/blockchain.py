@@ -1,5 +1,6 @@
 from hashlib import sha256
 from datetime import datetime
+from .block import Block
 import json
 
 MAX_PROOF = 2 ** 16
@@ -10,7 +11,7 @@ def compute_hash(body: str):
   return sha256(str(body).encode()).hexdigest()
 
 def compute_block_hash(block):
-  return sha256(json.dumps(block, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+  return sha256(block.as_json().encode()).hexdigest()
 
 def is_valid_hash(hexdigest):
   return int(hexdigest, 16) < TARGET_HASH
@@ -35,17 +36,16 @@ class Blockchain:
   
   def create_block(self, proof, previous_hash):
     """ Create a new block and append it at the end of the chain """
-    block = {
-      'index': len(self.chain) + 1,
-      'timestamp': str(datetime.now()),
-      'proof': proof,
-      'previous_hash': previous_hash
-    }
-
+    block = Block(
+      index = len(self.chain) + 1,
+      timestamp = str(datetime.now()),
+      proof = proof,
+      previous_hash = previous_hash
+    )
     self.chain.append(block)
     return block
 
-  def get_previous_block(self):
+  def get_last_block(self):
     """ Get the last block """
     return self.chain[-1]
   
@@ -60,9 +60,9 @@ class Blockchain:
     """
     previous_block = self.chain[0]
     for block in self.chain[1:]:
-      if (block['index'] != previous_block['index'] + 1 or
-          block['previous_hash'] != compute_block_hash(previous_block) or
-          not is_valid_hash(compute_hash(proof_computation(block['proof'], previous_block['proof'])))):
+      if (block.index != previous_block.index + 1 or
+          block.previous_hash != compute_block_hash(previous_block) or
+          not is_valid_hash(compute_hash(proof_computation(block.proof, previous_block.proof)))):
         return False
       previous_block = block
     return True
