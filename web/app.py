@@ -33,3 +33,10 @@ def get_chain():
     'length': len(chain)
   }
   return jsonify(response)
+
+@app.route('/validate', methods=['GET'])
+def validate_chain():
+  response = {
+    'is_valid': blockchain.is_chain_valid()
+  }
+  return jsonify(response)
