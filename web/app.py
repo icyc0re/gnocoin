@@ -24,3 +24,12 @@ def mine_block():
     'block': block.__dict__
   }
   return jsonify(response), 201
+
+@app.route('/blockchain', methods=['GET'])
+def get_chain():
+  chain = [block.as_dict() for block in blockchain.chain]
+  response = {
+    'chain': chain,
+    'length': len(chain)
+  }
+  return jsonify(response)
