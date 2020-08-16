@@ -3,7 +3,7 @@ from datetime import datetime
 from .block import Block
 import json
 
-MAX_PROOF = 2 ** 16
+MAX_PROOF = 2 ** 32
 TARGET_HASH = 2 ** 240 # digest with 4 leading zeros
 
 def compute_hash(body: str):
